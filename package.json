@@ -1,0 +1,25 @@
+{
+  "name": "simon-harlow-brainflix-api",
+  "version": "1.0.0",
+  "description": "back-end for brainflix",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/simon-harlow/simon-harlow-brainflix-api.git"
+  },
+  "author": "Simon Harlow",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/simon-harlow/simon-harlow-brainflix-api/issues"
+  },
+  "homepage": "https://github.com/simon-harlow/simon-harlow-brainflix-api#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "fs": "^0.0.1-security"
+  }
+}
