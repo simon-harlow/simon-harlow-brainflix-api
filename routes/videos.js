@@ -85,9 +85,9 @@ router.delete("/:videoId/comments/:commentId", (req, res) => {
         if (commentIndex === -1) {
             res.status(404).json({ message: "Comment not found" });
         } else {
-            video.comments.splice(commentIndex, 1);
+            const deletedComment = video.comments.splice(commentIndex, 1)[0];
             fs.writeFileSync("./data/video-details.json", JSON.stringify(videos));
-            res.status(200).json({ message: "Comment deleted" });
+            res.status(200).json(deletedComment);
         }
     }
 });
