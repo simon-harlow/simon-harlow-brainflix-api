@@ -3,47 +3,33 @@ const router = express.Router();
 const fs = require("fs");
 const { v4: uuidv4 } = require("uuid")
 
-// makes sure all data parsed is in json format
 router.use(express.json());
-
 
 router.use((_req, _res, next) => {
     console.log("Middleware from videos router");
     next();
 });
 
-
-// Get video list - e.g. next videos data
-function readVideos() {
-    const videosJSON = fs.readFileSync("./data/videos.json");
-    const parsedVideos = JSON.parse(videosJSON);
-    return parsedVideos;
-}
-
-// get detailed video data - e.g. per individual video
+// get detailed video data from JSON
 function readVideoDetails() {
     const videoDetailsJSON = fs.readFileSync("./data/video-details.json");
     const parsedVideoDetails = JSON.parse(videoDetailsJSON);
     return parsedVideoDetails;
 }
 
-
-// tested this on postman = WORKING!
-// test on react = working!
+// videos route
 router.get("/", (req, res) => {
-    res.json(readVideos());
+    res.json(readVideoDetails());
 });
 
-// tested this on postman = WORKING!
-// test on react = working!
+// video route by video uuid
 router.get("/:videoId", (req, res) => {
     const videos = readVideoDetails();
     const singleVideo = videos.find((video) => video.id === req.params.videoId);
     res.json(singleVideo);
 });
 
-// tested this on postman = WORKING!
-// test on react = working!
+// post comment to video by video uuid
 router.post("/:videoId/comments", (req, res) => {
     const videos = readVideoDetails();
     const videoIndex = videos.findIndex((video) => video.id === req.params.videoId);
@@ -70,7 +56,7 @@ router.post("/:videoId/comments", (req, res) => {
     }
 });
 
-
+// delete comment from video by comment uuid
 router.delete("/:videoId/comments/:commentId", (req, res) => {
     const videoId = req.params.videoId;
     const commentId = req.params.commentId;
