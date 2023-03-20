@@ -12,14 +12,6 @@ router.use((_req, _res, next) => {
     next();
 });
 
-
-// Get video list - e.g. next videos data
-function readVideos() {
-    const videosJSON = fs.readFileSync("./data/videos.json");
-    const parsedVideos = JSON.parse(videosJSON);
-    return parsedVideos;
-}
-
 // get detailed video data - e.g. per individual video
 function readVideoDetails() {
     const videoDetailsJSON = fs.readFileSync("./data/video-details.json");
@@ -31,7 +23,7 @@ function readVideoDetails() {
 // tested this on postman = WORKING!
 // test on react = working!
 router.get("/", (req, res) => {
-    res.json(readVideos());
+    res.json(readVideoDetails());
 });
 
 // tested this on postman = WORKING!
