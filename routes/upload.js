@@ -30,7 +30,7 @@ router.post("/", (req, res) => {
             timestamp: Date.now(),
             // the rest are placeholder values
             channel: "Roisin O'Neill",
-            image: "http://localhost:8080/images/._imageUpload.jpg",
+            image: "http://localhost:8080/images/imageUpload.jpg",
             views: "1,234,567",
             likes: "87,654",
             duration: "4:01",
