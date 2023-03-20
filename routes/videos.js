@@ -10,7 +10,7 @@ router.use((_req, _res, next) => {
     next();
 });
 
-// get detailed video data from JSON
+
 function readVideoDetails() {
     const videoDetailsJSON = fs.readFileSync("./data/video-details.json");
     const parsedVideoDetails = JSON.parse(videoDetailsJSON);
