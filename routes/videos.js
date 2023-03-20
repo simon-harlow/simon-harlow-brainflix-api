@@ -76,6 +76,7 @@ router.post("/:videoId/comments", (req, res) => {
                 name: req.body.name,
                 comment: req.body.comment,
                 id: uuidv4(),
+                likes: 0,
                 timestamp: Date.now()
             };
             videos[videoIndex].comments.push(newComment);
@@ -103,6 +104,28 @@ router.delete("/:videoId/comments/:commentId", (req, res) => {
             const deletedComment = video.comments.splice(commentIndex, 1)[0];
             fs.writeFileSync("./data/video-details.json", JSON.stringify(videos));
             res.status(200).json(deletedComment);
+        }
+    }
+});
+
+router.put("/:videoId/comments/:commentId/likes", (req, res) => {
+    const videoId = req.params.videoId;
+    const commentId = req.params.commentId;
+    const videos = readVideoDetails();
+    const video = videos.find((video) => video.id === videoId);
+
+    if (!video) {
+        res.status(404).json({ message: "Video not found" });
+    } else {
+        const commentIndex = video.comments.findIndex((comment) => comment.id === commentId);
+
+        if (commentIndex === -1) {
+            res.status(404).json({ message: "Comment not found" });
+        } else {
+            const comment = video.comments[commentIndex];
+            comment.likes += 1;
+            fs.writeFileSync("./data/video-details.json", JSON.stringify(videos));
+            res.status(200).json(comment);
         }
     }
 });
