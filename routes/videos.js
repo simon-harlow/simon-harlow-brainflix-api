@@ -16,7 +16,6 @@ function updateViews(req, res, next) {
     } else {
         const video = videos[videoIndex];
         video.views += 1;
-        console.log("update views in else", video)
         fs.writeFileSync("./data/video-details.json", JSON.stringify(videos));
         next();
     }
@@ -87,8 +86,6 @@ router.put("/:videoId/likes", (req, res) => {
 router.post("/:videoId/comments", (req, res) => {
     const videos = readVideoDetails();
     const videoIndex = videos.findIndex((video) => video.id === req.params.videoId);
-
-    console.log(req.body);
 
     if (videoIndex === -1) {
         res.status(404).json({ message: "Video not found" });

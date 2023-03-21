@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.static('public'))
 
 app.use((req, res, next) => {
-    console.log(`Request for path ${req.path} at ${new Date()}`);
+    console.log(`[${req.method}] Request for path "${req.path}" at ${new Date().toLocaleString('en-US')}`);
     next();
 });
 
