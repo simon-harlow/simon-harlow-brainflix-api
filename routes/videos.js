@@ -2,8 +2,25 @@ const express = require("express");
 const router = express.Router();
 const fs = require("fs");
 const { v4: uuidv4 } = require("uuid")
+const multer = require("multer");
+
+const upload = multer({ dest: "public/images/" });
 
 router.use(express.json());
+
+function readVideoDetails() {
+    const videoDetailsJSON = fs.readFileSync("./data/video-details.json");
+    const parsedVideoDetails = JSON.parse(videoDetailsJSON);
+    return parsedVideoDetails;
+}
+
+// handles converting filename from user uploaded image
+const handleFilename = (file) => {
+    const originalName = file.originalname;
+    const extension = originalName.split('.').pop();
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    return uniqueSuffix + '.' + extension;
+};
 
 // Middleware to update the views count for a video
 function updateViews(req, res, next) {
@@ -21,19 +38,13 @@ function updateViews(req, res, next) {
     }
 }
 
-function readVideoDetails() {
-    const videoDetailsJSON = fs.readFileSync("./data/video-details.json");
-    const parsedVideoDetails = JSON.parse(videoDetailsJSON);
-    return parsedVideoDetails;
-}
-
 // videos route
 router.get("/", (req, res) => {
     res.json(readVideoDetails());
 });
 
 // post new video via upload page
-router.post("/", (req, res) => {
+router.post("/", upload.single("image"), (req, res) => {
 
     if (!req.body || !req.body.title || !req.body.description) {
         res.status(400).json({ message: "Invalid request body" });
@@ -43,9 +54,10 @@ router.post("/", (req, res) => {
             title: req.body.title,
             description: req.body.description,
             timestamp: Date.now(),
+            // Set the image field to new file or default
+            image: req.file ? `http://localhost:8080/images/${req.file.filename}` : "http://localhost:8080/images/imageUpload.jpg",
             // the rest are placeholder values
             channel: "Roisin O'Neill",
-            image: "http://localhost:8080/images/imageUpload.jpg",
             views: 0,
             likes: 0,
             duration: "4:01",
@@ -53,10 +65,10 @@ router.post("/", (req, res) => {
             comments: []
         };
 
-    const videos = readVideoDetails();
-    videos.push(newVideo);
-    fs.writeFileSync("./data/video-details.json", JSON.stringify(videos));
-    res.status(200).json(newVideo);
+        const videos = readVideoDetails();
+        videos.push(newVideo);
+        fs.writeFileSync("./data/video-details.json", JSON.stringify(videos));
+        res.status(200).json(newVideo);
     }
 });
 

@@ -4,7 +4,6 @@ const PORT = 8080;
 const cors = require("cors");
 const videoRoutes = require("./routes/videos")
 
-
 app.use(cors());
 
 app.use(express.static('public'))
