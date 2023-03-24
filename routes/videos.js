@@ -8,19 +8,20 @@ const upload = multer({ dest: "public/images/" });
 
 router.use(express.json());
 
+// returns all fields for each video
 function readVideoDetails() {
     const videoDetailsJSON = fs.readFileSync("./data/video-details.json");
     const parsedVideoDetails = JSON.parse(videoDetailsJSON);
     return parsedVideoDetails;
 }
 
-// handles converting filename from user uploaded image
-const handleFilename = (file) => {
-    const originalName = file.originalname;
-    const extension = originalName.split('.').pop();
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    return uniqueSuffix + '.' + extension;
-};
+// returns less data for each video
+function readMinimalVideoDetails() {
+    const videoDetailsJSON = fs.readFileSync("./data/video-details.json");
+    const parsedVideoDetails = JSON.parse(videoDetailsJSON);
+    const minimalVideoDetails = parsedVideoDetails.map(({ id, title, channel, image }) => ({ id, title, channel, image }));
+    return minimalVideoDetails;
+}
 
 // Middleware to update the views count for a video
 function updateViews(req, res, next) {
@@ -29,7 +30,7 @@ function updateViews(req, res, next) {
     const videoIndex = videos.findIndex((video) => video.id === videoId);
 
     if (videoIndex === -1) {
-        res.status(404).json({ message: "Video not found" });
+        res.status(404).json({ message: "No video with that id exists" });
     } else {
         const video = videos[videoIndex];
         video.views += 1;
@@ -40,7 +41,12 @@ function updateViews(req, res, next) {
 
 // videos route
 router.get("/", (req, res) => {
-    res.json(readVideoDetails());
+    const minimalVideoDetails = readMinimalVideoDetails();
+    if (minimalVideoDetails.length === 0) {
+        res.status(404).json({ message: "No videos found" });
+    } else {
+        res.json(minimalVideoDetails);
+    }
 });
 
 // post new video via upload page
@@ -76,7 +82,11 @@ router.post("/", upload.single("image"), (req, res) => {
 router.get("/:videoId", updateViews, (req, res) => {
     const videos = readVideoDetails();
     const singleVideo = videos.find((video) => video.id === req.params.videoId);
-    res.json(singleVideo);
+    if (!singleVideo) {
+        res.status(404).json({ message: "No video with that id exists" });
+    } else {
+        res.json(singleVideo);
+    }
 });
 
 router.put("/:videoId/likes", (req, res) => {
@@ -85,7 +95,7 @@ router.put("/:videoId/likes", (req, res) => {
     const videoIndex = videos.findIndex((video) => video.id === videoId);
 
     if (videoIndex === -1) {
-        res.status(404).json({ message: "Video not found" });
+        res.status(404).json({ message: "No video with that id exists" });
     } else {
         const video = videos[videoIndex];
         video.likes += 1;
@@ -100,7 +110,7 @@ router.post("/:videoId/comments", (req, res) => {
     const videoIndex = videos.findIndex((video) => video.id === req.params.videoId);
 
     if (videoIndex === -1) {
-        res.status(404).json({ message: "Video not found" });
+        res.status(404).json({ message: "No video with that id exists" });
     } else {
         if (!req.body || !req.body.name || !req.body.comment) {
             console.log(req.body.name, req.body.comment);
@@ -128,7 +138,7 @@ router.delete("/:videoId/comments/:commentId", (req, res) => {
     const video = videos.find((video) => video.id === videoId);
 
     if (!video) {
-        res.status(404).json({ message: "Video not found" });
+        res.status(404).json({ message: "No video with that id exists" });
     } else {
         const commentIndex = video.comments.findIndex((comment) => comment.id === commentId);
 
@@ -149,7 +159,7 @@ router.put("/:videoId/comments/:commentId/likes", (req, res) => {
     const video = videos.find((video) => video.id === videoId);
 
     if (!video) {
-        res.status(404).json({ message: "Video not found" });
+        res.status(404).json({ message: "No video with that id exists" });
     } else {
         const commentIndex = video.comments.findIndex((comment) => comment.id === commentId);
 
