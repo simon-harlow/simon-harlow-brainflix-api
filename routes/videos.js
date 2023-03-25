@@ -4,6 +4,7 @@ const fs = require("fs");
 const { v4: uuidv4 } = require("uuid")
 const multer = require("multer");
 
+// multer added to handle file upload
 const upload = multer({ dest: "public/images/" });
 
 router.use(express.json());
@@ -15,7 +16,7 @@ function readVideoDetails() {
     return parsedVideoDetails;
 }
 
-// returns less data for each video
+// returns filtered/minimal data for each video
 function readMinimalVideoDetails() {
     const videoDetailsJSON = fs.readFileSync("./data/video-details.json");
     const parsedVideoDetails = JSON.parse(videoDetailsJSON);
@@ -23,7 +24,7 @@ function readMinimalVideoDetails() {
     return minimalVideoDetails;
 }
 
-// Middleware to update the views count for a video
+// Middleware to update the views count for a video everytime it is loaded
 function updateViews(req, res, next) {
     const videoId = req.params.videoId;
     const videos = readVideoDetails();
@@ -39,7 +40,7 @@ function updateViews(req, res, next) {
     }
 }
 
-// videos route
+// get filtered video data
 router.get("/", (req, res) => {
     const minimalVideoDetails = readMinimalVideoDetails();
     if (minimalVideoDetails.length === 0) {
@@ -78,7 +79,7 @@ router.post("/", upload.single("image"), (req, res) => {
     }
 });
 
-// video route by video uuid
+// get full video details by video uuid
 router.get("/:videoId", updateViews, (req, res) => {
     const videos = readVideoDetails();
     const singleVideo = videos.find((video) => video.id === req.params.videoId);
@@ -89,6 +90,7 @@ router.get("/:videoId", updateViews, (req, res) => {
     }
 });
 
+// like video by video uuid
 router.put("/:videoId/likes", (req, res) => {
     const videoId = req.params.videoId;
     const videos = readVideoDetails();
@@ -152,6 +154,7 @@ router.delete("/:videoId/comments/:commentId", (req, res) => {
     }
 });
 
+// like comment from video by comment uuid
 router.put("/:videoId/comments/:commentId/likes", (req, res) => {
     const videoId = req.params.videoId;
     const commentId = req.params.commentId;
